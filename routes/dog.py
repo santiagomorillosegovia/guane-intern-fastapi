@@ -53,6 +53,7 @@ def edit_dog(name: str, dog: Dog):
     new_dog = dict(dog)
     del new_dog ["create_date"]
     del new_dog ["id"]
+    del new_dog ["picture"]
     db.dogs.find_one_and_update({ "name": name },{"$set": new_dog})
     return "Dog Updated"
 
