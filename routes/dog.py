@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from config.db import db
 from schemas.dog import dogEntity, dogsEntity
+from security.model import UserLoginSchema, UserSchema
 from models.dog import Dog
 from datetime import datetime
 import requests
