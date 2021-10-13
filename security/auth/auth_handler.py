@@ -23,3 +23,11 @@ def signJWT(user_id: str) -> Dict[str, str]:
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     return token_response(token)
+
+
+def decodeJWT(token: str) -> dict:
+    try:
+        decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return decoded_token if decoded_token["expires"] >= time.time() else None
+    except:
+        return {}
