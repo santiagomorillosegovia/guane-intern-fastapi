@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, File, UploadFile
+from fastapi.params import File
 from config.db import db
 from schemas.dog import dogEntity, dogsEntity, userEntity, usersEntity
 from security.model import UserLoginSchema, UserSchema
@@ -9,7 +10,6 @@ from datetime import datetime
 from bson import ObjectId
 import requests
 import json
-
 
 dog = APIRouter()
 
@@ -121,3 +121,17 @@ def edit_user(id: str, user: UserSchema):
 def delete_user(id: str):
     db.users.find_one_and_delete({ "_id": ObjectId(id) })
     return "User Deleted"
+
+
+#######################
+
+@dog.post('/api/file', tags=["file"])
+async def upload_file(file: UploadFile = File(...)):
+    
+    new_file1 = await file.read()
+    
+    new_file = {'file': file.file}
+    
+    file_response = requests.post('https://gttb.guane.dev/api/files', files=new_file)
+ 
+    return new_file
