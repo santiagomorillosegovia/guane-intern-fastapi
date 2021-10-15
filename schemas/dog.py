@@ -7,7 +7,7 @@ def dogEntity(item) -> dict:
         "picture": item["picture"],
         "is_adopted": item["is_adopted"],
         "create_date": item["create_date"],
-        "id_user": item["owner"]
+        "id_user": item["id_user"]
 
     }
 

@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Body, Depends, File, UploadFile
+from fastapi.responses import JSONResponse
 from fastapi.params import File
 from config.db import db
-from schemas.dog import dogEntity, dogsEntity, userEntity, usersEntity
+from schemas.dog import dogsEntity, usersEntity
 from security.model import UserLoginSchema, UserSchema
 from security.auth.auth_handler import signJWT
 from security.auth.auth__bearer import JWTBearer
+from celery_worker import create_task
 from models.dog import Dog
 from datetime import datetime
 from bson import ObjectId
@@ -12,6 +14,7 @@ import requests
 import json
 
 dog = APIRouter()
+
 
 
 @dog.get('/api/dogs', tags=["dogs"])
@@ -31,16 +34,15 @@ def show_dog(name: str):
 
 
 @dog.post('/api/dogs/{name}', dependencies=[Depends(JWTBearer())], tags=["dogs"])
-def create_dog(dog: Dog):
+async def create_dog(dog: Dog):
     new_dog = dict(dog)
     del new_dog["create_date"]
     del new_dog["picture"]
-
     image = requests.get('https://dog.ceo/api/breeds/image/random')
     image = image.json()
     new_dog["picture"] = image["message"]
-
     new_dog["create_date"] = datetime.now()
+    task = create_task.delay(new_dog)
     db.dogs.insert_one(new_dog)
     return "Dog Saved"
 
